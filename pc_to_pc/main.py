@@ -8,6 +8,10 @@ This example shows communication between two PC's.  To run it:
           (last line of this module).
   -- Run it again with   main(2)   as the call to main.
 
+You will probably need to Edit Configuration, follow the Modify Options link,
+and check the Allow Multiple Instances option,
+to run two instances of this program at the same time, as required for the demo.
+
 Two GUIs will appear (one on top of the other).  Do what they suggest.
 The Console output will appear on TWO Run windows in PyCharm.
 

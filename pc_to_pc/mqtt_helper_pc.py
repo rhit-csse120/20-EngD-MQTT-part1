@@ -1,6 +1,6 @@
 """
 Library built on top of  paho.mqtt.client  for two devices to communicate
-through the Internet, using a MQTTT Broker as the intermediary.
+through the Internet, using a MQTT Broker as the intermediary.
 
 This library is for a PC as one of the two devices.
 See   mqtt_helper_pico   for the corresponding library for a Pico.
