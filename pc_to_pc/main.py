@@ -15,8 +15,7 @@ to run two instances of this program at the same time, as required for the demo.
 Two GUIs will appear (one on top of the other).  Do what they suggest.
 The Console output will appear on TWO Run windows in PyCharm.
 
-Authors: David Mutchler and his colleagues
-         at Rose-Hulman Institute of Technology.
+Authors: David Mutchler and his colleagues at Rose-Hulman Institute of Technology.
 """
 
 import tkinter
