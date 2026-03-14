@@ -3,6 +3,6 @@ Calls the  main  in  main_on_pc.py  with argument 1,
 indicating that this is PC 1 (talking to PC 2).
 """
 
-import main_on_pc
+import main
 
-main_on_pc.main(1)
+main.main(1)

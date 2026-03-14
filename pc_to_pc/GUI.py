@@ -4,7 +4,9 @@ Example showing for tkinter and ttk:
   -- Use the  mqtt_helper  module to communicate with the other device.
 
 This module is the GUI by which they communicate.
-See   main.py   for the main function.
+See   main.py   for the main function, as well as main1.py and main2.py,
+which call  main  in main.py with arguments 1 and 2, respectively.
+
 See   mqtt_helper_pc.py   for the MQTT code.
 
 Authors: David Mutchler and his colleagues
@@ -15,6 +17,8 @@ from tkinter import ttk
 
 
 class Gui(ttk.Frame):
+    """The GUI by which PC 1 and PC 2 communicate in this example."""
+
     def __init__(self, root, mqtt_client):
         super().__init__(root)
         self.root = root
@@ -38,5 +42,9 @@ class Gui(ttk.Frame):
         self.label.grid()
 
     def receive_message(self, message):
-        """Put the given message onto the label. Called by the MqttClient."""
+        """
+        This is the specially-named method that the MqttClient will call
+        when the MqttClient receives a message from the Broker.
+        In this case, the method puts the given message onto the label.
+        """
         self.label["text"] = message
