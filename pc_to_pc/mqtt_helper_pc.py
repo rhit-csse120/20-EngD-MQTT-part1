@@ -108,5 +108,7 @@ class MqttClient(paho.mqtt.client.Client):
 
     def send_message(self, message: str):
         """Publish (send to other device) the given message."""
+        # Show the message on the Console, for debugging as needed.
+        # Then publish the message to the broker.
         print("Sending", message)  # Shows on the Console, for debugging as needed
         self.publish(self.pc_to_device_topic, message)
