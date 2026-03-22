@@ -103,12 +103,12 @@ class MqttClient(paho.mqtt.client.Client):
         message = message_packet.payload.decode()
 
         # Show the message on the Console, for debugging as needed.
-        print(f"Received message: {message}")
+        print(f"\nReceived message: {message}")
         self.message_dispatcher.receive_message(message)
 
     def send_message(self, message: str):
         """Publish (send to other device) the given message."""
         # Show the message on the Console, for debugging as needed.
         # Then publish the message to the broker.
-        print("Sending", message)  # Shows on the Console, for debugging as needed
+        print("\nSending", message)
         self.publish(self.pc_to_device_topic, message)
