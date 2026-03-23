@@ -1,9 +1,10 @@
 """
 Library built on top of  paho.mqtt.client  for two devices to communicate
 through the Internet, using a MQTT Broker as the intermediary.
+Use as is except where TODO indicates otherwise.
 
 This library is for a PC as one of the two devices.
-See   mqtt_helper_pico   for the corresponding library for a Pico.
+See   mqtt_helper_pico.py   for the corresponding library for a Pico.
 
 See the  main_on_pc.py  file in this project for how to USE
 this library on a PC (laptop).  See the  main_on_pico.py  file
@@ -48,13 +49,21 @@ Authors: David Mutchler and his colleagues
 
 import paho.mqtt.client
 
-UNIQUE_ID = "DavidMutchler1019"  # Use something that no one else will use
+# The UNIQUE_ID, BROKER and TCP_PORT must match that of the Pico.
+UNIQUE_ID = "DavidMutchler1019"  # TODO: Use something that no one else will use
 BROKER = "broker.emqx.io"  # Or: "broker.hivemq.com", but must match Pico
 TCP_PORT = 1883
 
 
 class MqttClient(paho.mqtt.client.Client):
-    def __init__(self, suffix1="pc", suffix2="device", broker=BROKER):
+    def __init__(
+        self,
+        suffix1="pc",
+        suffix2="pico",
+        broker=BROKER,
+        tcp_port=TCP_PORT,
+        unique_id=UNIQUE_ID,
+    ):
         """
         suffix1 is the suffix used in the topic to which the pc PUBLISHES.
         suffix2 is the suffix used in the topic to which the pc SUBSCRIBES.
@@ -63,52 +72,71 @@ class MqttClient(paho.mqtt.client.Client):
 
         self.suffix1 = suffix1
         self.suffix2 = suffix2
-        self.pc_to_device_topic = UNIQUE_ID + "/" + suffix1 + "_to_" + suffix2
-        self.device_to_pc_topic = UNIQUE_ID + "/" + suffix2 + "_to_" + suffix1
-        self.on_connect = self.on_connect
-        self.on_message = self.on_message
         self.broker = broker
-        self.message_dispatcher = None  # Set later
+        self.tcp_port = tcp_port
+        self.unique_id = unique_id
 
+        self.pc_to_device_topic = self.unique_id + "/" + suffix1 + "_to_" + suffix2
+        self.device_to_pc_topic = self.unique_id + "/" + suffix2 + "_to_" + suffix1
+        self.message_dispatcher = None  # This is set later
         self.print_who_am_i()
 
     def print_who_am_i(self):
-        print(f"I am {self.suffix1}, talking to {self.suffix2}\n")
+        print(f"\nI am {self.suffix1}, talking to {self.suffix2}\n")
 
     def set_dispatcher(self, message_dispatcher):
         self.message_dispatcher = message_dispatcher
 
     def start(self):
+        """
+        Connect to the broker, subscribe to the relevant topic, and start the
+        event loop for the MqttClient, listening for messages in its own thread.
+        """
         print("Connecting to the broker...")
-        self.connect(BROKER, TCP_PORT)
-        self.loop_start()
+        self.connect(self.broker, self.tcp_port)
+
+        print("Subscribing to topic", self.device_to_pc_topic)
         self.subscribe(self.device_to_pc_topic)
 
-    def on_connect(self, mqtt_client, userdata, flags, reason_code, properties):
+        # Start the MQTT event loop, listening for messages.
+        self.loop_start()
+
+    def on_connect(
+        self, mqtt_client: MqttClient, userdata, flags, reason_code, properties
+    ):
         """
         Called when a connection to the Broker has been established
         or when the code has given up trying to do so (timeout).
         """
         if reason_code == "Success":
-            print(f"CONNECTED to MQTT broker {self.broker}")
+            print(f"CONNECTED to MQTT broker {self.broker}\n")
         else:
             print(f"Failed to connect to broker {self.broker}.\n")
             print(f"The return code was {reason_code}.\n")
 
-    def on_message(self, mqtt_client, userdata, message_packet):
+    def on_subscribe(
+        self, mqtt_client: MqttClient, userdata, topic, granted_qos, properties
+    ):
+        """Called when subscribed to a topic."""
+        print(f"SUBSCRIBED to topic {topic}, which is:")
+        print(f"{self.device_to_pc_topic}\n")
+
+    def on_message(self, mqtt_client, topic, message_packet):
         """
         Called when a message arrives.  Display it on Console.
         Send it to the dispatcher (e.g. the GUI) for processing.
         """
+        # Decode the given message.
         message = message_packet.payload.decode()
 
         # Show the message on the Console, for debugging as needed.
-        print(f"\nReceived message: {message}")
+        # Then dispatch the message to the message_dispatcher object.
+        print("Received message:", message)
         self.message_dispatcher.receive_message(message)
 
     def send_message(self, message: str):
         """Publish (send to other device) the given message."""
         # Show the message on the Console, for debugging as needed.
         # Then publish the message to the broker.
-        print("\nSending", message)
+        print(f"\nSending message: {message}")
         self.publish(self.pc_to_device_topic, message)

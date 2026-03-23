@@ -16,16 +16,16 @@ Authors: David Mutchler and his colleagues
 from tkinter import ttk
 
 
-class Gui(ttk.Frame):
+class Gui:
     """The GUI by which PC 1 and PC 2 communicate in this example."""
 
     def __init__(self, root, mqtt_client):
-        super().__init__(root)
+        # Required instance variables:
         self.root = root
         self.mqtt_client = mqtt_client
 
         # Frame that covers the root Toplevel.
-        frame = ttk.Frame(root)
+        frame = ttk.Frame(root, padding=10)
         frame.grid()
 
         # Entry box with data to send to the other computer.

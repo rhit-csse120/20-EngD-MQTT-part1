@@ -32,12 +32,13 @@ def main(which_pc):
     root = tkinter.Tk()
     root.title("MQTT example")
 
-    # Make the GUI.  # It is the dispatcher for the MqttClient
+    # Make the GUI. It is the dispatcher for the MqttClient
     # (i.e., it acts upon messages from the MqttClient).
-    gui = GUI.Gui(root, mqtt_client)  # The ttk.Frame that covers the root
+    gui = GUI.Gui(root, mqtt_client)
     mqtt_client.set_dispatcher(gui)
 
-    # Start the event loop for the MqttClient, in its own thread.
+    # Connect to the broker, subscribe to the relevant topic, and start the
+    # event loop for the MqttClient, listening for messages in its own thread.
     mqtt_client.start()
 
     # Stay in the event loop for the rest of the program's run.
