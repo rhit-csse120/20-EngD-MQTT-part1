@@ -48,6 +48,7 @@ Authors: David Mutchler and his colleagues
 """
 
 import paho.mqtt.client
+import time
 
 # The UNIQUE_ID, BROKER and TCP_PORT must match that of the Pico.
 UNIQUE_ID = "DavidMutchler1019"  # TODO: Use something that no one else will use
@@ -94,9 +95,11 @@ class MqttClient(paho.mqtt.client.Client):
         """
         print("Connecting to the broker...")
         self.connect(self.broker, self.tcp_port)
+        time.sleep(0.5)  # A little time to connect before continuing
 
         print("Subscribing to topic", self.device_to_pc_topic)
         self.subscribe(self.device_to_pc_topic)
+        time.sleep(0.5)  # A little time to subscribe before continuing
 
         # Start the MQTT event loop, listening for messages.
         self.loop_start()
@@ -115,13 +118,17 @@ class MqttClient(paho.mqtt.client.Client):
             print(f"The return code was {reason_code}.\n")
 
     def on_subscribe(
-        self, mqtt_client: MqttClient, userdata, topic, granted_qos, properties
+        self,
+        mqtt_client: MqttClient,
+        userdata,
+        message_id,
+        reason_code_list,
+        properties,
     ):
         """Called when subscribed to a topic."""
-        print(f"SUBSCRIBED to topic {topic}, which is:")
-        print(f"{self.device_to_pc_topic}\n")
+        print(f"SUBSCRIBED to topic {self.device_to_pc_topic}\n")
 
-    def on_message(self, mqtt_client, topic, message_packet):
+    def on_message(self, mqtt_client, userdata, message_packet):
         """
         Called when a message arrives.  Display it on Console.
         Send it to the dispatcher (e.g. the GUI) for processing.
